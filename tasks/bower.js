@@ -14,15 +14,14 @@ module.exports = function(grunt) {
   // ==========================================================================
   // TASKS
   // ==========================================================================
-  var task_name = 'bower'
-    , task_desc = 'Copy bower installed components to dist folder.'
+  var task_desc = 'Copy bower installed components to dist folder.'
     , _ = grunt.utils._
     , path = require('path')
     , bower = require('bower')
     , log = grunt.log.write
     , helpers = require('./lib/helpers').init(grunt);
 
-  grunt.registerMultiTask(task_name, task_desc, function() {
+  grunt.registerMultiTask('bower', task_desc, function() {
     var done = this.async()
       , dest = this.file.dest || path.join('public', 'scripts' ,'vendor')
       , options = this.data.options || {}
@@ -54,5 +53,34 @@ module.exports = function(grunt) {
       .on('error', function (err) {
         grunt.fail.warn(err);
       });
+  });
+
+  // alias
+  grunt.registerTask('bower:copy', 'bower');
+
+  // bower command wrapper
+  // basically copied from Yeoman's bower task
+  function bower_wrapper(cmd, done) {
+    // pull in the bower command module
+    var command = bower.commands[cmd];
+
+    // run
+    command.line(process.argv)
+      .on('error', grunt.fatal.bind(grunt.fail))
+      .on('data', grunt.log.writeln.bind(grunt.log))
+      .on('end', function(){
+        done();
+      });
+  }
+
+  // register bower commands as grunt tasks
+  Object.keys(bower.commands).forEach(function(cmd) {
+    var task_name = 'bower:' + cmd
+      , task_desc = 'wrapped bower ' + cmd + 'command.';
+
+    grunt.registerTask(task_name, task_desc, function() {
+      var done = this.async();
+      bower_wrapper(cmd, done);
+    });
   });
 };
