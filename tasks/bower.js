@@ -34,13 +34,24 @@ module.exports = function(grunt) {
           var preserved_path
             , dest_file_path;
 
+          // not sure if there is a standard for src_path or lib_name
+          // and I don't know whether the current issue belongs to Bower
+          // or other library authors
+          if(!_(src_path).endsWith('.js')) {
+            src_path += '.js';
+          }
+
+          if(!_(lib_name).endsWith('.js')) {
+            lib_name += '.js';
+          }
+
           if(base_path !== undefined) {
             preserved_path = helpers.strippedBasePath(base_path, src_path);
           } else {
             preserved_path = '';
           }
 
-          dest_file_path = path.join(dest, preserved_path, (lib_name + '.js'));
+          dest_file_path = path.join(dest, preserved_path, (lib_name));
 
           try {
             grunt.file.copy(src_path, dest_file_path);
