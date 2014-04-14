@@ -29,7 +29,7 @@ module.exports = function(grunt) {
     var options = this.data.options || {};
     var stripAffix = options.stripJsAffix || options.stripAffix;
 
-    bower.commands.list({paths: true, relative: false}, { directory: options.jsonFolder })
+    bower.commands.list({paths: true, relative: false})
       .on('end',  function (data) {
         _(data).each(function(lib_path, lib_name) {
           var dest_file_path;
@@ -69,6 +69,9 @@ module.exports = function(grunt) {
               var package_opt = options.packageSpecific &&
                 options.packageSpecific[lib_name];
               if(package_opt) {
+                // Remove previous selection
+                src_paths = [];
+                
                 package_dest = package_opt.dest;
                 package_dests = _(Object.keys(package_opt)).chain().filter(function(option) {
                   return _(option).endsWith('_dest');
